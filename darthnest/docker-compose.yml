@@ -1,0 +1,55 @@
+version: "3.9"
+services:
+  rabbitmq:
+    image: rabbitmq:3.9-management
+    container_name: rabbitmq
+    hostname: rabbitmq
+    volumes:
+      - /var/lib/rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - darthven
+
+  mongo:
+    image: mongo:latest
+    container_name: mongo
+    hostname: mongohost
+    env_file:
+      - ./.env
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: darthven
+      MONGO_INITDB_ROOT_PASSWORD: darthven123
+      MONGO_INITDB_DATABASE: darthdb
+    ports:
+      - 27017:27017
+    volumes:
+      - /data/db
+      - ./db-init/:/docker-entrypoint-initdb.d
+    networks:
+      - darthven
+    command: [--auth]
+
+  api_server:
+    image: nestjs-api-dev:1.0.0
+    container_name: api_server
+    build: 
+      context: .
+      target: development
+      dockerfile: ./Dockerfile
+    env_file:
+      - ./.env
+    command: npm run start:debug
+    depends_on:
+      - mongo
+      - rabbitmq
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    restart: unless-stopped
+    networks:
+      - darthven
+networks:
+  darthven:
+    driver: bridge

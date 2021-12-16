@@ -1,0 +1,14 @@
+{
+    "type": "mongodb",
+    "host": "mongohost",
+    "port": 27017,
+    "username": "darthven",
+    "password": "darthven123",
+    "database": "darthdb",
+    "useUnifiedTopology": true,
+    "useNewUrlParser": true,
+    "synchronize": false,
+    "entities": [
+        "dist/**/*.entity.js"
+    ]
+}
